@@ -137,7 +137,7 @@
     var iss = r.issues.map(function (i) {
       return '<div class="' + (i.level === 'error' ? 'warn' : 'dup') + '">' + (i.level === 'error' ? '✖ ' : '⚠ ') + esc(i.text) + '</div>';
     }).join('');
-    if (C.hasError(r.issues)) iss += '<div class="warn">Enter sẽ mở form để sửa</div>';
+    if (C.hasError(r.issues)) iss += '<div class="warn">Sửa lại cho đúng thì mới thêm được</div>';
     el.innerHTML = '→ ' + parts.join(' · ') + iss + (dup ? '<div class="dup">⚠ ' + esc(dup) + '</div>' : '');
   }
 
@@ -151,15 +151,12 @@
       openDrawer(null, { title: r.title, group: r.group, priority: r.priority, deadline: r.deadline ? C.toISO(r.deadline) : '' });
       return;
     }
+    if (C.hasError(parseNow(v).issues)) { updatePreview(); toast('Sửa lỗi nhập trước khi thêm'); return; }
     api.quickAdd(v).then(function (res) {
       $('q').value = '';
       updatePreview();
       prio.update();
-      if (res.needsForm) {
-        openDrawer(null, res.draft);
-        if (res.issues && res.issues.length) toast(res.issues[0].text);
-        return;
-      }
+      if (res.needsForm) { openDrawer(null, res.draft); return; }
       toast('Đã thêm: ' + res.task.title);
     }).catch(fail);
   }

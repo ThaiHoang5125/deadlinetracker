@@ -25,7 +25,7 @@
     var iss = r.issues.map(function (i) {
       return '<br><span class="' + (i.level === 'error' ? 'warn' : 'dup') + '">' + (i.level === 'error' ? '✖ ' : '⚠ ') + esc(i.text) + '</span>';
     }).join('');
-    if (C.hasError(r.issues)) iss += '<br><span class="warn">Enter sẽ mở form để sửa</span>';
+    if (C.hasError(r.issues)) iss += '<br><span class="warn">Sửa lại cho đúng thì mới thêm được</span>';
     el.innerHTML = '→ ' + parts.join(' · ') + iss + (dup ? '<br><span class="dup">⚠ ' + esc(dup) + '</span>' : '');
   }
 
@@ -54,6 +54,7 @@
   function submit() {
     var v = $('q').value.trim();
     if (!v || busy) return;
+    if (C.hasError(parse().issues)) { preview(); return; }
     busy = true;
     api.quickAdd(v).then(function (res) {
       if (res.needsForm) {
