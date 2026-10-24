@@ -1,7 +1,7 @@
 {
   "name": "deadline-tracker",
   "productName": "Deadline Tracker",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Ghi lại việc cần làm, nhắc trước deadline trên laptop và Google Calendar",
   "main": "src/main.js",
   "author": "Deadline Tracker",

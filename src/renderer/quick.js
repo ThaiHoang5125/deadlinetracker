@@ -4,6 +4,7 @@
   var api = window.api;
   var groups = [];
   var tasks = [];
+  var groupInfo = [];
   var busy = false;
 
   function $(id) { return document.getElementById(id); }
@@ -27,7 +28,7 @@
 
   var BASE_H = 176;
   var prio = QuickMenu.attach({
-    input: $('q'), host: document.body, groups: function () { return C.groupStats(tasks); },
+    input: $('q'), host: document.body, groups: function () { return groupInfo; },
     onResize: function (h) { api.resizeQuick(Math.max(BASE_H, h)).catch(function () {}); }
   });
 
@@ -76,8 +77,8 @@
 
   api.onQuickFocus(function () {
     reset();
-    api.getState().then(function (s) { groups = s.groups || []; tasks = s.tasks || []; }).catch(function () {});
+    api.getState().then(function (s) { groups = s.groups || []; tasks = s.tasks || []; groupInfo = s.groupStats || []; }).catch(function () {});
   });
-  api.onState(function (s) { groups = s.groups || []; tasks = s.tasks || []; });
+  api.onState(function (s) { groups = s.groups || []; tasks = s.tasks || []; groupInfo = s.groupStats || []; });
   $('q').focus();
 })();

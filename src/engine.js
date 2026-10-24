@@ -23,6 +23,7 @@ function defaultData() {
     fired: {},
     snoozes: {},
     digestDate: '',
+    extraGroups: [],
     baselined: false,
     lastSync: 0
   };
@@ -109,9 +110,11 @@ class Engine extends EventEmitter {
     const tasks = Object.keys(this.data.tasks).map((k) => this.data.tasks[k]).filter((t) => !t.deleted);
     const dirty = tasks.filter((t) => t._dirty).length +
       Object.keys(this.data.tasks).filter((k) => this.data.tasks[k].deleted && this.data.tasks[k]._dirty).length;
+    const groupStats = Core.groupStats(tasks, this.data.extraGroups);
     return {
       tasks,
-      groups: Core.groupsOf(tasks),
+      groups: groupStats.map((g) => g.name),
+      groupStats,
       sync: Object.assign({}, this.sync, { pending: dirty, linked: this.linked() }),
       settings: Object.assign({}, this.data.settings),
       linkHost: this.linked() ? 'script.google.com' : ''
@@ -208,6 +211,64 @@ class Engine extends EventEmitter {
     if (!t || t.deleted || t.status === 'done') return;
     this.data.snoozes[id] = this.now() + Math.max(1, minutes) * Core.MIN;
     this.changed();
+  }
+
+  // ------------------------------------------------------------- quản lý nhóm
+  // Nhóm là một trường của từng việc nên đổi tên/xóa nhóm = sửa các việc đó (và tự đồng bộ).
+  // Nhóm tạo sẵn nhưng chưa có việc chỉ lưu trên máy này (extraGroups).
+  _cleanGroup(name) {
+    const n = String(name || '').trim().replace(/^#+/, '').replace(/\s+/g, ' ').slice(0, 60).trim();
+    if (!n) throw new Error('Tên nhóm đang trống');
+    return n;
+  }
+
+  _allGroups() {
+    return Core.groupStats(Object.keys(this.data.tasks).map((k) => this.data.tasks[k]), this.data.extraGroups).map((g) => g.name);
+  }
+
+  _inGroup(name) {
+    return Object.keys(this.data.tasks).map((k) => this.data.tasks[k]).filter((t) => !t.deleted && t.group === name);
+  }
+
+  addGroup(name) {
+    const n = this._cleanGroup(name);
+    if (this._allGroups().some((g) => Core.fold(g) === Core.fold(n))) throw new Error('Nhóm "' + n + '" đã có');
+    this.data.extraGroups.push(n);
+    this.changed();
+    return { name: n };
+  }
+
+  // Đổi sang tên một nhóm khác đã có (không phân biệt hoa thường/dấu) = gộp hai nhóm
+  renameGroup(from, to) {
+    const n = this._cleanGroup(to);
+    const same = this._allGroups().find((g) => g !== from && Core.fold(g) === Core.fold(n));
+    const target = same || n;
+    if (target === from) return { name: from, changed: 0, merged: false };
+    const list = this._inGroup(from);
+    list.forEach((t) => this._touch(Object.assign({}, t, { group: target }), false));
+    this.data.extraGroups = this.data.extraGroups.filter((g) => g !== from && g !== target);
+    if (!list.length) this.data.extraGroups.push(target);
+    this.changed();
+    return { name: target, changed: list.length, merged: !!same };
+  }
+
+  // Xóa nhóm: các việc trong nhóm vẫn còn, chỉ bỏ nhóm. Trả về id để hoàn tác bằng assignGroup.
+  deleteGroup(name) {
+    const list = this._inGroup(name);
+    list.forEach((t) => this._touch(Object.assign({}, t, { group: '' }), false));
+    this.data.extraGroups = this.data.extraGroups.filter((g) => g !== name);
+    this.changed();
+    return { ids: list.map((t) => t.id), name };
+  }
+
+  assignGroup(ids, name) {
+    let n = 0;
+    (ids || []).forEach((id) => {
+      const t = this.data.tasks[id];
+      if (t && !t.deleted) { this._touch(Object.assign({}, t, { group: name }), false); n++; }
+    });
+    this.changed();
+    return { changed: n };
   }
 
   // Nhập nhanh một dòng. Thiếu tên hoặc thiếu hạn thì trả về bản nháp để mở form.

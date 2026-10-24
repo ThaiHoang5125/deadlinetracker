@@ -174,7 +174,7 @@ test('gõ # -> nhận diện thẻ nhóm đang gõ dở', () => {
 test('thống kê nhóm: đếm việc đang mở', () => {
   const mk = (group, status, deleted) => ({ id: group + status, group, status, deleted: !!deleted });
   const st = Core.groupStats([mk('B', 'todo'), mk('B', 'done'), mk('A', 'done'), mk('C', 'todo', true)]);
-  assert.deepStrictEqual(st, [{ name: 'A', count: 0 }, { name: 'B', count: 1 }]);
+  assert.deepStrictEqual(st, [{ name: 'A', count: 0, total: 1 }, { name: 'B', count: 1, total: 2 }]);
 });
 
 test('cảnh báo trùng hạn', () => {

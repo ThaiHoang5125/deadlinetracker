@@ -115,6 +115,7 @@
     S = st;
     render();
     if (!$('settings').classList.contains('hidden')) renderSettingsState();
+    if (!$('groupsm').classList.contains('hidden') && gmEditing === null) renderGroups();
     if (form && form.id && !S.tasks.some(function (t) { return t.id === form.id; })) closeDrawer();
   }
 
@@ -285,12 +286,77 @@
     h.value = st.digestHour || 8;
   }
 
+  // ------------------------------------------------------------ quản lý nhóm
+  var gmEditing = null; // tên nhóm đang đổi tên
+  var gmArmed = ''; // nhóm đang chờ bấm lần hai để xóa
+  var gmArmTimer = null;
+
+  function gmMsg(text, kind) { $('gmmsg').textContent = text || ''; $('gmmsg').className = 'msg ' + (kind || ''); }
+
+  function renderGroups() {
+    var st = S.groupStats || C.groupStats(S.tasks);
+    if (!st.length) { $('gmlist').innerHTML = '<div class="gm-empty">Chưa có nhóm nào. Gõ tên ở ô phía trên rồi bấm Thêm, hoặc dùng #tên khi nhập việc.</div>'; return; }
+    $('gmlist').innerHTML = st.map(function (g) {
+      var n = esc(g.name);
+      var open = g.count + ' đang mở' + (g.total > g.count ? ' · ' + (g.total - g.count) + ' xong' : '');
+      if (gmEditing === g.name) {
+        return '<div class="gm-row" data-name="' + n + '"><span class="gm-dot" style="background:' + C.groupColor(g.name) + '"></span>' +
+          '<input class="in" id="gmedit" maxlength="60" value="' + n + '" spellcheck="false">' +
+          '<button class="btn primary" data-gact="save">Lưu</button><button class="btn" data-gact="cancel">Hủy</button></div>';
+      }
+      return '<div class="gm-row" data-name="' + n + '"><span class="gm-dot" style="background:' + C.groupColor(g.name) + '"></span>' +
+        '<span class="gm-name" title="' + n + '">' + n + '</span><span class="gm-n">' + open + '</span>' +
+        '<button class="btn" data-gact="ren">Đổi tên</button>' +
+        '<button class="btn danger" data-gact="del">' + (gmArmed === g.name ? 'Chạm lại để xóa' : 'Xóa') + '</button></div>';
+    }).join('');
+    if (gmEditing !== null) { var ed = $('gmedit'); if (ed) { ed.focus(); ed.select(); } }
+  }
+
+  function openGroups() {
+    gmEditing = null; gmArmed = '';
+    gmMsg('');
+    $('gmnew').value = '';
+    $('groupsm').classList.remove('hidden');
+    renderGroups();
+    $('gmnew').focus();
+  }
+
+  function closeGroups() { $('groupsm').classList.add('hidden'); gmEditing = null; gmArmed = ''; }
+
+  function gmAdd() {
+    var v = $('gmnew').value;
+    if (!v.trim()) { $('gmnew').focus(); return; }
+    api.addGroup(v).then(function (r) { $('gmnew').value = ''; gmMsg('Đã thêm nhóm "' + r.name + '"', 'ok'); renderGroups(); })
+      .catch(function (e) { gmMsg(e.message, 'err'); });
+  }
+
+  function gmSaveRename(from) {
+    var to = ($('gmedit') || {}).value || '';
+    api.renameGroup(from, to).then(function (r) {
+      gmEditing = null;
+      gmMsg(r.changed === 0 && r.name === from ? '' : (r.merged ? 'Đã gộp vào nhóm "' + r.name + '"' : 'Đã đổi tên thành "' + r.name + '"') + (r.changed ? ' · ' + r.changed + ' việc' : ''), 'ok');
+      renderGroups();
+    }).catch(function (e) { gmMsg(e.message, 'err'); });
+  }
+
+  function gmDelete(name) {
+    gmArmed = ''; clearTimeout(gmArmTimer);
+    api.deleteGroup(name).then(function (r) {
+      renderGroups();
+      gmMsg('Đã xóa nhóm "' + name + '"' + (r.ids.length ? ' · ' + r.ids.length + ' việc không còn nhóm' : ''), 'ok');
+      toast('Đã xóa nhóm "' + name + '"', 'Hoàn tác', function () {
+        // nhóm có việc: gán lại nhóm cho các việc đó; nhóm trống: tạo lại nhóm trống
+        (r.ids.length ? api.assignGroup(r.ids, name) : api.addGroup(name)).catch(fail);
+      });
+    }).catch(function (e) { gmMsg(e.message, 'err'); });
+  }
+
   function setMsg(text, kind) { $('smsg').textContent = text; $('smsg').className = 'msg ' + (kind || ''); }
 
   // ------------------------------------------------------------------ sự kiện
   function bind() {
     $('q').addEventListener('input', updatePreview);
-    prio = QuickMenu.attach({ input: $('q'), host: document.querySelector('.top'), groups: function () { return C.groupStats(S.tasks); } });
+    prio = QuickMenu.attach({ input: $('q'), host: document.querySelector('.top'), groups: function () { return S.groupStats || C.groupStats(S.tasks); } });
     $('q').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') { e.preventDefault(); quickAdd(e.ctrlKey || e.shiftKey); }
       if (e.key === 'Tab' && $('q').value.trim() && !e.shiftKey) { e.preventDefault(); quickAdd(true); }
@@ -321,6 +387,31 @@
       api.syncNow().then(function (r) { if (!r.ok) toast(r.error || 'Đồng bộ thất bại'); else if (r.calendarError) toast('Đã đồng bộ, nhưng Calendar báo lỗi: ' + r.calendarError); }).catch(fail);
     });
     $('settingsbtn').addEventListener('click', openSettings);
+    $('gmbtn').addEventListener('click', openGroups);
+    $('gmclose').addEventListener('click', closeGroups);
+    $('groupsm').addEventListener('mousedown', function (e) { if (e.target === $('groupsm')) closeGroups(); });
+    $('gmadd').addEventListener('click', gmAdd);
+    $('gmnew').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); gmAdd(); } });
+    $('gmlist').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-gact]');
+      var row = e.target.closest('.gm-row');
+      if (!b || !row) return;
+      var name = row.getAttribute('data-name');
+      var a = b.getAttribute('data-gact');
+      if (a === 'ren') { gmEditing = name; gmArmed = ''; renderGroups(); }
+      else if (a === 'cancel') { gmEditing = null; renderGroups(); }
+      else if (a === 'save') gmSaveRename(name);
+      else if (a === 'del') {
+        if (gmArmed === name) gmDelete(name);
+        else { gmArmed = name; renderGroups(); clearTimeout(gmArmTimer); gmArmTimer = setTimeout(function () { gmArmed = ''; renderGroups(); }, 3000); }
+      }
+    });
+    $('gmlist').addEventListener('keydown', function (e) {
+      if (e.target.id !== 'gmedit') return;
+      var name = e.target.closest('.gm-row').getAttribute('data-name');
+      if (e.key === 'Enter') { e.preventDefault(); gmSaveRename(name); }
+      else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); gmEditing = null; renderGroups(); }
+    });
     $('sclose').addEventListener('click', function () { $('settings').classList.add('hidden'); });
     $('settings').addEventListener('mousedown', function (e) { if (e.target === $('settings')) $('settings').classList.add('hidden'); });
 
@@ -410,7 +501,8 @@
 
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') {
-        if (!$('settings').classList.contains('hidden')) $('settings').classList.add('hidden');
+        if (!$('groupsm').classList.contains('hidden')) closeGroups();
+        else if (!$('settings').classList.contains('hidden')) $('settings').classList.add('hidden');
         else if (form) closeDrawer();
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && form) {
         e.preventDefault(); saveForm();

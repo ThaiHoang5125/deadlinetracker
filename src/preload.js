@@ -25,6 +25,11 @@ contextBridge.exposeInMainWorld('api', {
   restoreTask: (id) => call('task:restore', id),
   snooze: (id, minutes) => call('task:snooze', id, minutes),
 
+  addGroup: (name) => call('group:add', name),
+  renameGroup: (from, to) => call('group:rename', from, to),
+  deleteGroup: (name) => call('group:delete', name),
+  assignGroup: (ids, name) => call('group:assign', ids, name),
+
   quickAdd: (text) => call('quick:add', text),
   hideQuick: () => call('quick:hide'),
   resizeQuick: (height) => call('quick:resize', height),

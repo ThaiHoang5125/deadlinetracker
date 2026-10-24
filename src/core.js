@@ -749,12 +749,20 @@
   }
 
   // Nhóm kèm số việc đang mở, để hiện trong menu gợi ý
-  function groupStats(tasks) {
+  // extras: các nhóm tạo sẵn nhưng chưa có việc nào (chỉ lưu trên máy này)
+  function groupStats(tasks, extras) {
     var counts = {};
+    var total = {};
     tasks.forEach(function (t) {
-      if (t.group && !t.deleted) counts[t.group] = (counts[t.group] || 0) + (t.status === 'done' ? 0 : 1);
+      if (t.group && !t.deleted) {
+        total[t.group] = (total[t.group] || 0) + 1;
+        counts[t.group] = (counts[t.group] || 0) + (t.status === 'done' ? 0 : 1);
+      }
     });
-    return groupsOf(tasks).map(function (n) { return { name: n, count: counts[n] || 0 }; });
+    var names = groupsOf(tasks);
+    (extras || []).forEach(function (n) { if (n && names.indexOf(n) < 0) names.push(n); });
+    names.sort(function (a, b) { return a.localeCompare(b, 'vi'); });
+    return names.map(function (n) { return { name: n, count: counts[n] || 0, total: total[n] || 0 }; });
   }
 
   // Việc đang mở có cùng hạn (tính đến phút) với hạn vừa nhập

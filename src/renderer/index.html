@@ -30,6 +30,7 @@
         <option value="farthest">Hạn xa nhất</option>
       </select>
       <select id="gf" class="in"></select>
+      <button id="gmbtn" class="btn" title="Thêm, đổi tên, xóa nhóm">Nhóm…</button>
       <input id="search" class="in" placeholder="Tìm việc…" spellcheck="false">
     </div>
   </div>
@@ -117,6 +118,18 @@
         <h3>Thông tin</h3>
         <div id="sinfo" class="hint"></div>
       </section>
+    </div>
+  </div>
+</div>
+
+<div id="groupsm" class="modal hidden" role="dialog" aria-label="Quản lý nhóm">
+  <div class="mcard">
+    <div class="dhead"><h2>Quản lý nhóm</h2><button id="gmclose" class="btn">Đóng</button></div>
+    <div class="mbody">
+      <div class="addrow"><input id="gmnew" class="in" placeholder="Tên nhóm mới…" maxlength="60" autocomplete="off" spellcheck="false"><button id="gmadd" class="btn primary">Thêm</button></div>
+      <div id="gmmsg" class="msg"></div>
+      <div id="gmlist"></div>
+      <div class="hint">Đổi tên cập nhật mọi việc trong nhóm (kể cả tiêu đề trên Google Calendar). Đổi sang tên một nhóm đã có là gộp hai nhóm. Xóa nhóm không xóa việc, chỉ bỏ nhóm khỏi các việc đó. Nhóm trống tạo ở đây chỉ lưu trên máy này.</div>
     </div>
   </div>
 </div>

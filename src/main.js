@@ -253,6 +253,10 @@ function setupIpc() {
   handle('task:delete', (id) => { engine.deleteTask(id); removeCardItem(id); });
   handle('task:restore', (id) => engine.restoreTask(id));
   handle('task:snooze', (id, m) => { engine.snooze(id, m); removeCardItem(id); });
+  handle('group:add', (n) => engine.addGroup(n));
+  handle('group:rename', (from, to) => engine.renameGroup(from, to));
+  handle('group:delete', (n) => engine.deleteGroup(n));
+  handle('group:assign', (ids, n) => engine.assignGroup(ids, n));
   handle('quick:add', (text) => engine.quickAdd(text));
   handle('quick:hide', () => { if (quickWin) quickWin.hide(); });
   handle('quick:resize', (h) => {
