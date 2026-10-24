@@ -1,0 +1,32 @@
+{
+  "name": "deadline-tracker",
+  "productName": "Deadline Tracker",
+  "version": "1.0.2",
+  "description": "Ghi lại việc cần làm, nhắc trước deadline trên laptop và Google Calendar",
+  "main": "src/main.js",
+  "author": "Deadline Tracker",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test \"test/*.test.js\"",
+    "dist": "electron-builder --win portable nsis",
+    "build:gas": "node apps-script/build.js"
+  },
+  "devDependencies": {
+    "electron": "^44.9.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "vn.deadline.tracker",
+    "productName": "Deadline Tracker",
+    "electronLanguages": ["vi", "en-US"],
+    "files": ["src/**/*", "assets/**/*", "package.json"],
+    "asarUnpack": ["assets/**/*"],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": ["portable", "nsis"]
+    },
+    "nsis": { "oneClick": true, "perMachine": false }
+  }
+}

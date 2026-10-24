@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Nhắc việc</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  html, body { background: var(--card); overflow: hidden; user-select: none; }
+  body { border: 1.5px solid var(--accent); }
+  #wrap { padding: 10px 14px 12px; }
+  .head { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--accent); padding-bottom: 6px; }
+  .head button { border: 0; background: transparent; color: var(--muted); font-size: 12px; }
+  .head button:hover { color: var(--text); }
+  .item { padding: 9px 0; border-top: 1px solid var(--line); }
+  .t { font-weight: 700; font-size: 14.5px; word-break: break-word; }
+  .b { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .late { color: var(--c-critical); font-weight: 600; }
+  .acts { display: flex; gap: 7px; margin-top: 8px; }
+  .acts .btn { padding: 4px 11px; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="head"><span>&#9200; NHẮC VIỆC</span><button id="all">Bỏ qua tất cả</button></div>
+  <div id="items"></div>
+</div>
+<script src="card.js"></script>
+</body>
+</html>

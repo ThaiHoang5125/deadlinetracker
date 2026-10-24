@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:">
+<title>Deadline Tracker</title>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="quickrow">
+      <input id="q" class="big" placeholder="Thêm nhanh: Nộp báo cáo #BTL1 !1 thứ 6 tuần sau 17h  (nhóm nhiều từ: #&quot;Toán rời rạc&quot;)" autocomplete="off" spellcheck="false">
+      <button id="qa" class="btn primary">Thêm</button>
+      <button id="qf" class="btn" title="Mở form đầy đủ">Chi tiết…</button>
+    </div>
+    <div id="preview" class="preview"></div>
+  </header>
+
+  <div class="toolbar">
+    <nav id="tabs" class="tabs"></nav>
+    <div class="tools">
+      <select id="sortsel" class="in" title="Sắp xếp (phím 1-5 khi không gõ vào ô nào)">
+        <option value="deadline">Sắp xếp: Hạn gần nhất</option>
+        <option value="priority">Ưu tiên 1 → 5</option>
+        <option value="group">Theo nhóm / môn</option>
+        <option value="newest">Mới thêm trước</option>
+        <option value="title">Tên A → Z</option>
+        <option value="farthest">Hạn xa nhất</option>
+      </select>
+      <select id="gf" class="in"></select>
+      <input id="search" class="in" placeholder="Tìm việc…" spellcheck="false">
+    </div>
+  </div>
+
+  <main id="list" class="list"></main>
+
+  <footer class="status">
+    <span id="syncdot" class="dot"></span>
+    <span id="synctext"></span>
+    <span class="grow"></span>
+    <button id="syncbtn" class="btn">Đồng bộ</button>
+    <button id="settingsbtn" class="btn">Cài đặt</button>
+  </footer>
+</div>
+
+<div id="scrim" class="scrim hidden"></div>
+<aside id="drawer" class="drawer hidden" aria-label="Chi tiết việc">
+  <div class="dhead">
+    <h2 id="dtitle">Việc mới</h2>
+    <button id="dclose" class="btn" aria-label="Đóng">Đóng</button>
+  </div>
+  <div class="dbody">
+    <label>Tên việc</label>
+    <input id="fname" class="in" maxlength="200">
+    <div class="two">
+      <div><label>Hạn chót</label><input id="fdl" class="in" type="datetime-local"><div id="fdup" class="dup hint hidden"></div></div>
+      <div><label>Nhóm / môn</label><input id="fgroup" class="in" list="glist" maxlength="60" placeholder="Ví dụ: BTL1"><datalist id="glist"></datalist></div>
+    </div>
+    <label>Ưu tiên <span class="hint" id="fpriohint"></span></label><div class="seg" id="fprio"></div>
+    <label>Trạng thái</label><div class="seg" id="fstatus"></div>
+    <label>Chi tiết công việc</label>
+    <textarea id="fdetails" class="in" maxlength="4000"></textarea>
+    <label>Ghi chú</label>
+    <textarea id="fnotes" class="in" maxlength="4000"></textarea>
+    <label>Việc con (checklist)</label>
+    <div id="fcheck"></div>
+    <div class="addrow"><input id="fcheckadd" class="in" placeholder="Thêm việc con rồi nhấn Enter…"><button id="fcheckbtn" class="btn">Thêm</button></div>
+    <label>Nhắc trước hạn <span class="hint">— bấm để bật/tắt; laptop nhắc đủ mọi mốc, Google Calendar giữ 5 mốc gần hạn nhất</span></label>
+    <div id="frem" class="chips"></div>
+    <div class="addrow">
+      <input id="fcn" class="in" type="number" min="1" max="999" placeholder="Số" style="width:90px">
+      <select id="fcu" class="in" style="width:110px"><option value="1">phút</option><option value="60">giờ</option><option value="1440" selected>ngày</option><option value="10080">tuần</option></select>
+      <button id="fcadd" class="btn">+ Thêm mốc</button>
+    </div>
+  </div>
+  <div class="dfoot">
+    <button id="fdel" class="btn danger">Xóa</button>
+    <span class="grow"></span>
+    <span class="hint">Ctrl+Enter để lưu</span>
+    <button id="fsave" class="btn primary">Lưu</button>
+  </div>
+</aside>
+
+<div id="settings" class="modal hidden" role="dialog" aria-label="Cài đặt">
+  <div class="mcard">
+    <div class="dhead"><h2>Cài đặt</h2><button id="sclose" class="btn">Đóng</button></div>
+    <div class="mbody">
+      <section>
+        <h3>Kết nối Google</h3>
+        <div id="linkstate" class="hint"></div>
+        <label>Link Web app (kết thúc bằng /exec)</label>
+        <input id="slink" class="in" placeholder="https://script.google.com/macros/s/…/exec" spellcheck="false">
+        <label>Khóa bảo mật <span class="hint">(trong tab Config của Google Sheet; bỏ trống nếu link đã có ?key=…)</span></label>
+        <input id="skey" class="in" type="password" spellcheck="false" autocomplete="off">
+        <div class="addrow">
+          <button id="sconnect" class="btn primary">Kết nối</button>
+          <button id="sdisconnect" class="btn danger">Ngắt kết nối</button>
+        </div>
+        <div id="smsg" class="msg"></div>
+      </section>
+      <section>
+        <h3>Nhắc nhở</h3>
+        <label>Kiểu thông báo</label>
+        <select id="sstyle" class="in">
+          <option value="card">Thẻ nhắc nổi góc màn hình, có nút Xong / Nhắc lại 1h</option>
+          <option value="toast">Thông báo Windows (nằm trong Trung tâm thông báo)</option>
+          <option value="both">Cả hai</option>
+        </select>
+        <label class="check"><input type="checkbox" id="sdigest"> Tóm tắt buổi sáng lúc
+          <select id="sdigesth" class="in" style="width:80px;display:inline-block"></select></label>
+        <label class="check"><input type="checkbox" id="sauto"> Tự chạy khi bật máy (nằm ở khay hệ thống)</label>
+        <div class="addrow"><button id="stest" class="btn">Gửi thử thông báo</button><span id="shotkey" class="hint"></span></div>
+      </section>
+      <section>
+        <h3>Thông tin</h3>
+        <div id="sinfo" class="hint"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"><span id="tmsg"></span><button id="tact"></button></div>
+
+<script src="../core.js"></script>
+<script src="quick-menu.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

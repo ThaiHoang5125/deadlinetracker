@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+<title>Thêm nhanh</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  html, body { background: var(--card); overflow: hidden; }
+  body { border: 1.5px solid var(--accent); height: 100vh; padding: 16px 18px; position: relative; }
+  .lbl { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+  input { width: 100%; padding: 13px 15px; font-size: 18px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--bg); }
+  input:focus { outline: none; border-color: var(--accent); }
+  #preview { min-height: 44px; margin-top: 10px; font-size: 13.5px; color: var(--muted); }
+  #preview b { color: var(--text); }
+  #preview .warn { color: var(--danger); }
+  #preview .okk { color: var(--ok); font-weight: 600; }
+  .keys { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  kbd { background: var(--bg); border: 1px solid var(--line-strong); border-radius: 5px; padding: 0 5px; font: 11px/16px "Segoe UI", sans-serif; }
+</style>
+</head>
+<body>
+  <div class="lbl"><span>Thêm việc nhanh</span><span>Deadline Tracker</span></div>
+  <input id="q" placeholder="Nộp báo cáo #BTL1 !1 thứ 6 tuần sau 17h  (gõ ! để chọn mức ưu tiên)" autocomplete="off" spellcheck="false">
+  <div id="preview"></div>
+  <div class="keys"><kbd>Enter</kbd> lưu · <kbd>Tab</kbd> mở form đầy đủ · <kbd>Esc</kbd> đóng</div>
+<script src="../core.js"></script>
+<script src="quick-menu.js"></script>
+<script src="quick.js"></script>
+</body>
+</html>
