@@ -21,9 +21,12 @@
     if (r.group) parts.push('#' + esc(r.group));
     if (r.priority !== C.DEFAULT_PRIORITY) parts.push('ưu tiên ' + r.priority + ' (' + esc(C.PRIORITY_LABEL[r.priority].toLowerCase()) + ')');
     if (r.deadline) parts.push(esc(C.fmtDeadline(r.deadline)) + ' (' + esc(C.relativeText(r.deadline)) + ')');
-    else parts.push('<span class="warn">chưa có hạn — Enter sẽ mở form để chọn</span>');
     var dup = r.deadline ? C.dupText(C.findDuplicates(tasks, r.deadline), r.title) : '';
-    el.innerHTML = '→ ' + parts.join(' · ') + (dup ? '<br><span class="dup">⚠ ' + esc(dup) + '</span>' : '');
+    var iss = r.issues.map(function (i) {
+      return '<br><span class="' + (i.level === 'error' ? 'warn' : 'dup') + '">' + (i.level === 'error' ? '✖ ' : '⚠ ') + esc(i.text) + '</span>';
+    }).join('');
+    if (C.hasError(r.issues)) iss += '<br><span class="warn">Enter sẽ mở form để sửa</span>';
+    el.innerHTML = '→ ' + parts.join(' · ') + iss + (dup ? '<br><span class="dup">⚠ ' + esc(dup) + '</span>' : '');
   }
 
   var BASE_H = 176;

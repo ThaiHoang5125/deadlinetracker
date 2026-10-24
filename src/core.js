@@ -297,6 +297,10 @@
     return { title: title, body: parts.join(' · '), rel: rel };
   }
 
+  function hasError(issues) {
+    return (issues || []).some(function (i) { return i.level === 'error'; });
+  }
+
   // ---------------------------------------------------- phân tích nhập nhanh
   function baseChar(c) {
     if (c === 'đ') return 'd';
@@ -685,6 +689,32 @@
     }
 
     result.reminders = offsetsForPriority(result.priority);
+
+    // 8) kiểm tra nhập thiếu / nhập sai: level 'error' = chặn thêm thẳng (phải qua form), 'warn' = chỉ cảnh báo
+    var issues = [];
+    if (text.trim()) {
+      var badBang = [];
+      var goodBang = [];
+      var bre = /(^|\s)!([^\s]+)/g;
+      var bm;
+      while ((bm = bre.exec(f))) {
+        var bs = bm.index + bm[1].length;
+        if (!free(bs, bm.index + bm[0].length)) {
+          var pv = priorityFromWord(bm[2]);
+          if (pv) goodBang.push(pv);
+        } else if (/^[a-z0-9]+$/.test(bm[2]) && !priorityFromWord(bm[2])) {
+          badBang.push('!' + text.slice(bs + 1, bm.index + bm[0].length));
+        }
+      }
+      if (badBang.length) issues.push({ level: 'error', code: 'priority', text: 'Mức ưu tiên không hợp lệ: ' + badBang.join(', ') + ' (dùng !1…!5, !cao, !tb, !thap)' });
+      else if (goodBang.some(function (v) { return v !== goodBang[0]; })) issues.push({ level: 'warn', code: 'priority-conflict', text: 'Nhập nhiều mức ưu tiên khác nhau, đang lấy mức ' + result.priority });
+      if (!result.title) issues.push({ level: 'error', code: 'title', text: 'Thiếu tên việc' });
+      if (!deadline) issues.push({ level: 'error', code: 'deadline', text: 'Chưa có hạn — thêm "mai", "thứ 6", "25/10", "17h"…' });
+      else if (deadline.getTime() <= now.getTime()) issues.push({ level: 'error', code: 'past', text: 'Hạn ' + fmtDeadline(deadline, now) + ' đã qua' });
+      else if (!relDeadline && date && hour === null) issues.push({ level: 'warn', code: 'no-time', text: 'Chưa nói giờ cụ thể — hạn mặc định 23:59' });
+      else if (!relDeadline && !date && hour !== null) issues.push({ level: 'warn', code: 'no-date', text: 'Chưa nói ngày — hiểu là ' + fmtDeadline(deadline, now) });
+    }
+    result.issues = issues;
     return result;
   }
 
@@ -805,7 +835,7 @@
     DEFAULT_OFFSETS: DEFAULT_OFFSETS, PRESET_OFFSETS: PRESET_OFFSETS, DEFAULT_PRIORITY: DEFAULT_PRIORITY,
     normPriority: normPriority, offsetsForPriority: offsetsForPriority,
     bangTyping: bangTyping, hashTyping: hashTyping, priorityOptions: priorityOptions,
-    groupStats: groupStats, findDuplicates: findDuplicates, dupText: dupText, priorityFromWord: priorityFromWord, normOffsets: normOffsets, fmtOffset: fmtOffset,
+    hasError: hasError, groupStats: groupStats, findDuplicates: findDuplicates, dupText: dupText, priorityFromWord: priorityFromWord, normOffsets: normOffsets, fmtOffset: fmtOffset,
     toISO: toISO, toInputValue: toInputValue, fromInputValue: fromInputValue,
     startOfDay: startOfDay, addDays: addDays, dayKey: dayKey,
     fmtDeadline: fmtDeadline, fmtTime: fmtTime, relativeText: relativeText,

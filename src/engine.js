@@ -275,9 +275,10 @@ class Engine extends EventEmitter {
   quickAdd(text) {
     const groups = Core.groupsOf(Object.keys(this.data.tasks).map((k) => this.data.tasks[k]).filter((t) => !t.deleted));
     const r = Core.parseQuick(text, new Date(this.now()), { groups });
-    if (!r.title || !r.deadline) {
+    if (!r.title || !r.deadline || Core.hasError(r.issues)) {
       return {
         needsForm: true,
+        issues: r.issues,
         draft: {
           title: r.title, group: r.group, priority: r.priority,
           deadline: r.deadline ? Core.toISO(r.deadline) : '', reminders: r.reminders

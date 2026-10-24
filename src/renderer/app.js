@@ -133,9 +133,12 @@
     if (r.group) parts.push('#' + esc(r.group));
     if (r.priority !== C.DEFAULT_PRIORITY) parts.push('ưu tiên ' + r.priority + ' (' + esc(C.PRIORITY_LABEL[r.priority].toLowerCase()) + ')');
     if (r.deadline) parts.push(esc(C.fmtDeadline(r.deadline)) + ' (' + esc(C.relativeText(r.deadline)) + ')');
-    else parts.push('<span class="warn">chưa có hạn — thêm "mai", "thứ 6", "25/10"… (Enter để mở form)</span>');
     var dup = r.deadline ? C.dupText(C.findDuplicates(S.tasks, r.deadline), r.title) : '';
-    el.innerHTML = '→ ' + parts.join(' · ') + (dup ? '<div class="dup">⚠ ' + esc(dup) + '</div>' : '');
+    var iss = r.issues.map(function (i) {
+      return '<div class="' + (i.level === 'error' ? 'warn' : 'dup') + '">' + (i.level === 'error' ? '✖ ' : '⚠ ') + esc(i.text) + '</div>';
+    }).join('');
+    if (C.hasError(r.issues)) iss += '<div class="warn">Enter sẽ mở form để sửa</div>';
+    el.innerHTML = '→ ' + parts.join(' · ') + iss + (dup ? '<div class="dup">⚠ ' + esc(dup) + '</div>' : '');
   }
 
   function quickAdd(forceForm) {
@@ -152,7 +155,11 @@
       $('q').value = '';
       updatePreview();
       prio.update();
-      if (res.needsForm) { openDrawer(null, res.draft); return; }
+      if (res.needsForm) {
+        openDrawer(null, res.draft);
+        if (res.issues && res.issues.length) toast(res.issues[0].text);
+        return;
+      }
       toast('Đã thêm: ' + res.task.title);
     }).catch(fail);
   }
@@ -240,6 +247,7 @@
     var dl = C.fromInputValue($('fdl').value);
     if (!title) { $('fname').focus(); toast('Hãy nhập tên việc'); return; }
     if (!dl) { $('fdl').focus(); toast('Hãy chọn hạn chót'); return; }
+    if (!form.id && d.status !== 'done' && dl.getTime() <= Date.now()) { $('fdl').focus(); toast('Hạn chót đã qua, hãy chọn thời điểm trong tương lai'); return; }
     var fields = {
       title: title, deadline: C.toISO(dl), group: $('fgroup').value.trim().replace(/^#/, ''),
       priority: d.priority, status: d.status, details: $('fdetails').value, notes: $('fnotes').value,
