@@ -1,7 +1,7 @@
 {
   "name": "deadline-tracker",
   "productName": "Deadline Tracker",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Ghi lại việc cần làm, nhắc trước deadline trên laptop và Google Calendar",
   "main": "src/main.js",
   "author": "Deadline Tracker",
@@ -23,6 +23,7 @@
     "electronLanguages": ["vi", "en-US"],
     "files": ["src/**/*", "assets/**/*", "package.json"],
     "asarUnpack": ["assets/**/*"],
+    "extraResources": [{ "from": "apps-script/Code.gs", "to": "Code.gs" }],
     "win": {
       "icon": "assets/icon.ico",
       "target": ["portable", "nsis"]

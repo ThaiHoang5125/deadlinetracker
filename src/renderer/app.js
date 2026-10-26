@@ -101,7 +101,7 @@
     dot.className = 'dot ' + (s.status || '');
     var txt;
     var pending = s.pending ? ' · ' + s.pending + ' thay đổi chờ gửi' : '';
-    if (!s.linked) txt = 'Chưa kết nối Google — dữ liệu chỉ lưu trên máy này và chưa có nhắc trên Calendar/điện thoại';
+    if (!s.linked) txt = 'Đang dùng trên máy này — dữ liệu lưu cục bộ (có thể kết nối Google trong Cài đặt > Nâng cao)';
     else if (s.status === 'syncing') txt = 'Đang đồng bộ…';
     else if (s.status === 'offline') txt = 'Đang offline' + pending + ' — sẽ tự gửi khi có mạng';
     else if (s.status === 'error') txt = 'Lỗi đồng bộ: ' + (s.error || '') + pending;
@@ -278,7 +278,7 @@
 
   function renderSettingsState() {
     var s = S.sync || {};
-    $('linkstate').textContent = s.linked ? 'Đã kết nối với Google (' + (S.linkHost || '') + '). Dán link mới bên dưới nếu muốn đổi.' : 'Chưa kết nối. Làm theo HUONG-DAN.md để tạo Web app, rồi dán link vào đây.';
+    $('linkstate').textContent = s.linked ? 'Đã kết nối với Google (' + (S.linkHost || '') + '). Dán link mới bên dưới nếu muốn đổi.' : 'Chưa kết nối (không bắt buộc). Muốn nhắc qua Google Calendar/điện thoại, bấm nút Hướng dẫn để xem cách tạo Web app rồi dán link vào đây.';
     $('sdisconnect').style.display = s.linked ? '' : 'none';
     var st = S.settings || {};
     $('sstyle').value = st.reminderStyle || 'card';
@@ -392,6 +392,8 @@
       api.syncNow().then(function (r) { if (!r.ok) toast(r.error || 'Đồng bộ thất bại'); else if (r.calendarError) toast('Đã đồng bộ, nhưng Calendar báo lỗi: ' + r.calendarError); }).catch(fail);
     });
     $('settingsbtn').addEventListener('click', openSettings);
+    $('helpbtn').addEventListener('click', function () { $('help').classList.remove('hidden'); });
+    $('hclose').addEventListener('click', function () { $('help').classList.add('hidden'); });
     $('gmbtn').addEventListener('click', openGroups);
     $('gmclose').addEventListener('click', closeGroups);
     $('groupsm').addEventListener('mousedown', function (e) { if (e.target === $('groupsm')) closeGroups(); });
@@ -551,10 +553,6 @@
     bind();
     api.getState().then(function (st) {
       applyState(st);
-      if (!st.sync.linked && st.tasks.length === 0) {
-        // lần đầu mở app: gợi ý kết nối
-        setTimeout(openSettings, 400);
-      }
     }).catch(fail);
     $('q').focus();
   }

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "Deadline Tracker" (`vn.deadline.tracker`): app Electron trên máy tính để ghi việc cần làm và nhắc trước deadline, đồng bộ qua một Google Apps Script web app sang Google Calendar và Google Sheets. Toàn bộ chuỗi giao diện và comment trong code đều bằng tiếng Việt.
 
-Mã nguồn được dựng lại từ bản build `DeadlineTracker-1.0.0-portable.exe` (giải nén exe -> `app-64.7z` -> `resources/app.asar`), không phải từ repo gốc. Phần server Apps Script không có trong repo này. `HUONG-DAN.md` mà giao diện nhắc tới cũng chưa có.
+Mã nguồn được dựng lại từ bản build `DeadlineTracker-1.0.0-portable.exe` (giải nén exe -> `app-64.7z` -> `resources/app.asar`), không phải từ repo gốc. Phần server Apps Script không có trong repo này. `HUONG-DAN.md` là hướng dẫn người dùng cuối, viết sau khi dựng lại. Lần đầu mở app không ép kết nối Google: dùng cục bộ là mặc định, phần Google nằm trong mục "Nâng cao" của Cài đặt.
 
 ## Lệnh
 

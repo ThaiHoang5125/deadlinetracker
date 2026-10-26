@@ -42,6 +42,7 @@
     <span id="synctext"></span>
     <span class="grow"></span>
     <button id="syncbtn" class="btn">Đồng bộ</button>
+    <button id="helpbtn" class="btn">Hướng dẫn</button>
     <button id="settingsbtn" class="btn">Cài đặt</button>
   </footer>
 </div>
@@ -84,12 +85,42 @@
   </div>
 </aside>
 
+<div id="help" class="modal hidden" role="dialog" aria-label="Hướng dẫn">
+  <div class="mcard">
+    <div class="dhead"><h2>Hướng dẫn</h2><button id="hclose" class="btn">Đóng</button></div>
+    <div class="mbody">
+      <section>
+        <h3>Dùng ngay, không cần Google</h3>
+        <div class="hint">Dữ liệu lưu riêng trên máy bạn, nhắc việc chạy cục bộ. Đóng cửa sổ chỉ ẩn app; thoát qua biểu tượng ở khay hệ thống.</div>
+        <ul>
+          <li><b>Ctrl+Alt+N</b>: nhập nhanh. <b>Ctrl+Alt+L</b>: mở danh sách.</li>
+          <li><b>#nhóm</b> hoặc <b>#"nhóm nhiều từ"</b>: gán nhóm.</li>
+          <li><b>!1</b>..<b>!5</b> (1 = cao nhất) hoặc <b>!cao</b>, <b>!tb</b>, <b>!thap</b>: ưu tiên. Gõ <b>!</b> hoặc <b>#</b> để hiện gợi ý.</li>
+          <li>Ví dụ: <i>Nộp báo cáo #công ty !2 17h thứ 6</i></li>
+        </ul>
+      </section>
+      <section>
+        <h3>Tùy chọn: nhắc qua Google Calendar và điện thoại</h3>
+        <div class="hint">Mỗi người tự tạo backend trong tài khoản Google của mình.</div>
+        <ol>
+          <li>Tạo một Google Sheet mới.</li>
+          <li>Extensions &gt; Apps Script, dán toàn bộ file <b>Code.gs</b> (bản cài đặt có sẵn trong thư mục <b>resources</b> cạnh file app; mở bằng cách bấm chuột phải biểu tượng app trong Start &gt; Open file location; bản portable thì nhờ người gửi app đưa kèm).</li>
+          <li>Chạy hàm <b>setup</b> và cấp quyền. Khóa bảo mật nằm ở tab Config của Sheet.</li>
+          <li>Deploy &gt; New deployment &gt; Web app: Execute as <b>Me</b>, access <b>Anyone</b>. Chép link kết thúc bằng /exec.</li>
+          <li>Cài đặt &gt; Nâng cao: dán link và khóa, bấm Kết nối.</li>
+        </ol>
+        <div class="hint">Khóa bảo mật là lớp bảo vệ duy nhất của link, đừng chia sẻ.</div>
+      </section>
+    </div>
+  </div>
+</div>
+
 <div id="settings" class="modal hidden" role="dialog" aria-label="Cài đặt">
   <div class="mcard">
     <div class="dhead"><h2>Cài đặt</h2><button id="sclose" class="btn">Đóng</button></div>
     <div class="mbody">
-      <section>
-        <h3>Kết nối Google</h3>
+      <details>
+        <summary><h3 style="display:inline">Nâng cao: kết nối Google (không bắt buộc)</h3></summary>
         <div id="linkstate" class="hint"></div>
         <label>Link Web app (kết thúc bằng /exec)</label>
         <input id="slink" class="in" placeholder="https://script.google.com/macros/s/…/exec" spellcheck="false">
@@ -100,7 +131,7 @@
           <button id="sdisconnect" class="btn danger">Ngắt kết nối</button>
         </div>
         <div id="smsg" class="msg"></div>
-      </section>
+      </details>
       <section>
         <h3>Nhắc nhở</h3>
         <label>Kiểu thông báo</label>
