@@ -1,0 +1,46 @@
+Mục tiêu: gửi Deadline Tracker cho bạn bè và đồng nghiệp dùng trên Windows. Mỗi người dùng cục bộ, không cần Google. Google Calendar và điện thoại là tùy chọn.
+
+Đã xong (commit 098819b, chưa push)
+- Lần đầu mở app không còn ép kết nối Google. Thanh trạng thái ghi "Đang dùng trên máy này".
+- Phần Google nằm trong Cài đặt > Nâng cao.
+- Thêm nút Hướng dẫn trong app và file HUONG-DAN.md.
+- Nâng lên bản 1.0.4. Bản cài mang theo Code.gs trong thư mục resources.
+- Xóa thư mục rác %TEMP%/ và thêm vào .gitignore.
+- npm test đạt 38/38.
+- Đã build hai file trong dist/:
+  - Deadline Tracker Setup 1.0.4.exe (bản cài)
+  - Deadline Tracker 1.0.4.exe (portable)
+- Bản build mở được với dữ liệu sạch, không bị đóng đột ngột.
+
+Việc của bạn
+1. Kiểm tra trên máy bạn. Chạy với thư mục dữ liệu tạm để không đụng dữ liệu thật:
+   & ".\dist\Deadline Tracker 1.0.4.exe" --user-data-dir="$env:TEMP\dt-test"
+   - Không hiện hộp kết nối Google.
+   - Nút Hướng dẫn mở và đóng được.
+   - Mục Nâng cao gập và mở được.
+   - Ctrl+Alt+N thêm được việc.
+   - Thẻ nhắc hiện đúng giờ.
+   - Tắt rồi mở lại, việc vẫn còn.
+2. Cài thử bản Setup trên máy hoặc tài khoản Windows khác.
+   - Không bị hỏi quyền admin.
+   - Qua cảnh báo SmartScreen bằng More info > Run anyway.
+   - Làm lại các mục ở bước 1.
+   - Thử tìm Code.gs theo cách chỉ trong Hướng dẫn.
+   - Gỡ cài đặt xong thì app phải biến mất khỏi Start.
+3. Gửi file cho mọi người kèm lời nhắn bên dưới. Người dùng bản portable mà muốn dùng Google thì gửi thêm apps-script/Code.gs.
+
+Lời nhắn gửi kèm
+
+▎ Đây là Deadline Tracker, app ghi việc và nhắc trước deadline, chạy trên Windows.
+▎ 1. Chạy Deadline Tracker Setup 1.0.4.exe (hoặc bản portable, không cần cài). Không cần quyền admin.
+▎ 2. Windows có thể báo "Windows protected your PC" vì app chưa ký số. Chọn More info > Run anyway.
+▎ 3. Dùng ngay, không cần Google. Ctrl+Alt+N thêm việc, Ctrl+Alt+L xem danh sách. Gõ #nhóm và !1..!5 (1 là cao nhất). Bấm nút Hướng dẫn trong app để xem thêm.
+▎ 4. Muốn nhắc qua Google Calendar hoặc điện thoại thì làm theo phần Hướng dẫn trong app. Việc này là tùy chọn.
+
+Việc có thể làm sau (không bắt buộc)
+- Push commit lên remote.
+- Mã hóa khóa Google bằng safeStorage của Electron. Hiện khóa lưu dạng văn bản thường trong deadline-data.json.
+- Ký số để hết cảnh báo SmartScreen, và thêm tự cập nhật nếu sau này phát hành rộng hơn.
+- Giới hạn đã biết: parseQuick có thể hiểu nhầm số trong tiêu đề, ví dụ "Bài 3/4" thành ngày 3/4.
+
+Nếu bước 1 hoặc 2 có lỗi, gửi tôi nội dung lỗi hoặc mô tả màn hình để tôi sửa.
