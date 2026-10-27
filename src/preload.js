@@ -41,6 +41,7 @@ contextBridge.exposeInMainWorld('api', {
   disconnect: () => call('sync:disconnect'),
   setSettings: (patch) => call('settings:set', patch),
   testNotification: () => call('app:test-notification'),
+  openAuthor: () => call('app:open-author'),
 
   openMain: (opts) => call('win:open-main', opts || {}),
   onOpenTask: (cb) => listen('main:open-task', cb),

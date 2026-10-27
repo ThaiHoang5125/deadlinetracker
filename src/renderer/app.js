@@ -393,6 +393,7 @@
     });
     $('settingsbtn').addEventListener('click', openSettings);
     $('helpbtn').addEventListener('click', function () { $('help').classList.remove('hidden'); });
+    $('authorbtn').addEventListener('click', function () { window.api.openAuthor().catch(function () {}); });
     $('hclose').addEventListener('click', function () { $('help').classList.add('hidden'); });
     $('gmbtn').addEventListener('click', openGroups);
     $('gmclose').addEventListener('click', closeGroups);

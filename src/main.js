@@ -55,6 +55,8 @@ function logLine(msg) {
   try { fs.appendFileSync(path.join(app.getPath('userData'), 'debug.log'), new Date().toISOString() + ' ' + msg + '\n'); } catch (e) { /* bỏ qua */ }
 }
 
+const AUTHOR_URL = 'https://candid-truffle-741aaf.netlify.app/';
+
 function lockNavigation(win) {
   win.webContents.on('did-fail-load', (_e, code, desc, url) => logLine('did-fail-load ' + code + ' ' + desc + ' ' + url));
   win.webContents.on('render-process-gone', (_e, d) => logLine('render-process-gone ' + JSON.stringify(d)));
@@ -278,6 +280,8 @@ function setupIpc() {
     else showMain();
     if (quickWin) quickWin.hide();
   });
+  // URL cố định trong main, renderer không được truyền URL vào
+  handle('app:open-author', () => shell.openExternal(AUTHOR_URL));
   handle('app:test-notification', () => {
     handleReminders([{
       id: 'test', title: 'Thử thông báo', body: 'Nếu bạn thấy thông báo này, nhắc việc đã hoạt động.',

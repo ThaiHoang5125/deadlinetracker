@@ -4,17 +4,17 @@ Mục tiêu: gửi Deadline Tracker cho bạn bè và đồng nghiệp dùng tr�
 - Lần đầu mở app không còn ép kết nối Google. Thanh trạng thái ghi "Đang dùng trên máy này".
 - Phần Google nằm trong Cài đặt > Nâng cao.
 - Thêm nút Hướng dẫn trong app và file HUONG-DAN.md.
-- Nâng lên bản 1.0.4. Bản cài mang theo Code.gs trong thư mục resources.
+- Phiên bản 1.0.0. Bản cài mang theo Code.gs trong thư mục resources.
 - Xóa thư mục rác %TEMP%/ và thêm vào .gitignore.
 - npm test đạt 38/38.
 - Đã build hai file trong dist/:
-  - Deadline Tracker Setup 1.0.4.exe (bản cài)
-  - Deadline Tracker 1.0.4.exe (portable)
+  - Deadline Tracker Setup 1.0.0.exe (bản cài)
+  - Deadline Tracker 1.0.0.exe (portable)
 - Bản build mở được với dữ liệu sạch, không bị đóng đột ngột.
 
 Việc của bạn
 1. Kiểm tra trên máy bạn. Chạy với thư mục dữ liệu tạm để không đụng dữ liệu thật:
-   & ".\dist\Deadline Tracker 1.0.4.exe" --user-data-dir="$env:TEMP\dt-test"
+   & ".\dist\Deadline Tracker 1.0.0.exe" --user-data-dir="$env:TEMP\dt-test"
    - Không hiện hộp kết nối Google.
    - Nút Hướng dẫn mở và đóng được.
    - Mục Nâng cao gập và mở được.
@@ -32,7 +32,7 @@ Việc của bạn
 Lời nhắn gửi kèm
 
 ▎ Đây là Deadline Tracker, app ghi việc và nhắc trước deadline, chạy trên Windows.
-▎ 1. Chạy Deadline Tracker Setup 1.0.4.exe (hoặc bản portable, không cần cài). Không cần quyền admin.
+▎ 1. Chạy Deadline Tracker Setup 1.0.0.exe (hoặc bản portable, không cần cài). Không cần quyền admin.
 ▎ 2. Windows có thể báo "Windows protected your PC" vì app chưa ký số. Chọn More info > Run anyway.
 ▎ 3. Dùng ngay, không cần Google. Ctrl+Alt+N thêm việc, Ctrl+Alt+L xem danh sách. Gõ #nhóm và !1..!5 (1 là cao nhất). Bấm nút Hướng dẫn trong app để xem thêm.
 ▎ 4. Muốn nhắc qua Google Calendar hoặc điện thoại thì làm theo phần Hướng dẫn trong app. Việc này là tùy chọn.
