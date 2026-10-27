@@ -3,3 +3,4 @@ dist/
 *.log
 *.exe
 %TEMP%/
+note.txt
